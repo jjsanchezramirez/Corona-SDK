@@ -5,9 +5,9 @@
 ---- The MIT License (MIT) (see LICENSE.txt for details)
 ----------------------------------------------------------------------------------------------------
 --
--- Date: November 2014
+-- Date: January 2015
 --
--- Version: 1.0
+-- Version: 1.01
 --
 -- File name: bitmapfont.lua
 --
@@ -35,7 +35,10 @@
 ---- To activate dynamic selection of fonts set dynamicScaling to true. To deactivate it set
 ---- it to false. Be sure to have ONLY the necessary image files in your resource directory.
 ----
----- Updated by Juan Jose Sanchez Ramirez in November 24, 2014.
+---- Update by Juan Jose Sanchez Ramirez in January 15, 2015.
+----   * Added parent group parameter
+----
+---- Updated by Juan Jose Sanchez Ramirez in November 23, 2014.
 ----   * Added dynamic font scaling
 ----   * Fixed alignment
 ----
@@ -55,7 +58,7 @@ local sbFont = {}
 local sbFont_mt = { __index = sbFont }
 
 local dynamicScaling = true
-local imageSuffix = { "@2x", "@4x" }
+local imageSuffix = { '@2x', '@4x' }
 local scaleFactor = { 1.5, 3 }
 
 local width = display.pixelWidth
@@ -76,7 +79,7 @@ local aspectRatio = width / ( height / width > 1.5 and 320 or ceil( 480 / ( heig
 ----------------------------------------------------------------------------------------------------
 
 function sbFont:load( fntFile, path )
-    local path = path or ""
+    local path = path or ''
     local function extract( s, p )
         return string.match( s, p ), string.gsub( s, p, '', 1 )
     end
@@ -87,13 +90,13 @@ function sbFont:load( fntFile, path )
         chars = {},
         kernings = {}
     }
-    local suffix = ""
+    local suffix = ''
     if dynamicScaling then
         if scaleFactor[2] and aspectRatio >= scaleFactor[2] then suffix = imageSuffix[2]
         elseif scaleFactor[1] and aspectRatio >= scaleFactor[1] then suffix = imageSuffix[1]
         end
     end
-    local readline = io.lines( system.pathForFile( path .. fntFile .. suffix .. ".fnt", system.ResourceDirectory ) )
+    local readline = io.lines( system.pathForFile( path .. fntFile .. suffix .. '.fnt', system.ResourceDirectory ) )
     for line in readline do
         local t = {}
         local tag
@@ -189,14 +192,21 @@ end
 ----------------------------------------------------------------------------------------------------
 -- FUNCTION NEW STRING
 --
----- Pass a font object and a string.
+---- Pass a font object and a string. Group parameter is optional.
 ---- It returns a display object of the rendered string.
----- Fields "font", "text", and "align" can be read and modified.
+---- Fields 'font', 'text' and 'align' can be read and modified.
 ---- Text can be aligned to the left, right, or center.
 ----------------------------------------------------------------------------------------------------
 
-function sbFont:newString( font, text )
+function sbFont:newString( group, font, text, align )
     local obj = display.newGroup()
+    if type(font) == 'string' then
+        align = text
+        text = font
+        font = group
+    else
+        group:insert(obj)
+    end
     accessorize( obj )
     removerize( obj )
     obj.set_font = function( t, k, v ) obj.raw_font = v end
@@ -246,7 +256,7 @@ function sbFont:newString( font, text )
                             x = x + font.kernings[ last .. c ]
                         end
                         letter.x = t.raw_font.chars[c].xoffset + x
-                        letter.y = t.raw_font.chars[c].yoffset - t.raw_font.info.base + y
+                        letter.y = t.raw_font.chars[c].yoffset - t.raw_font.info.base + y - ceil( t.raw_font.info.lineHeight * 0.5 )
                         t:insert( letter )
                         last = c
                     end
@@ -257,10 +267,11 @@ function sbFont:newString( font, text )
                 end
             end
         end
+        t.align = obj.align
     end
     obj.font = font
-    obj.align = 'left'
-    obj.text = (text or '')
+    obj.align = align or 'left'
+    obj.text = text or ''
     local scale = 1
     if dynamicScaling then
         if scaleFactor[2] and aspectRatio >= scaleFactor[2] then scale = 0.25
