@@ -17,8 +17,8 @@
 ---- http://web-b1.anscamobile.com/code/calendar-sample
 ---- http://www.josellausas.com/2013/05/a-better-slideview-for-corona-sdk/
 ----
----- New Calendar Viewis a simple calendar widget for Corona SDK. It displays the current month and
----- uses swipe gestures to switch month.
+---- New Calendar View is a simple calendar widget for Corona SDK. It displays the current month
+---- and uses swipe gestures to switch month.
 ----
 ---- Last updated by Juan Jose Sanchez Ramirez on January 6, 2016.
 ----   * Switched from center aligment to top-left alignment
