@@ -36,5 +36,5 @@ background:setFillColor(
 	math.random(5,9)*0.1, math.random(5,9)*0.1, math.random(7,9)*0.1)
 
 -- Create calendar widget
-local newSlideView = require('newCalendarView')
+local newCalendarView = require('newCalendarView')
 local view = newCalendarView.new(month, year)
